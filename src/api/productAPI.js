@@ -1,5 +1,10 @@
 import axios from "axios";
 
+export const getData = async ({ queryKey }) => {
+  const res = await axios.get(`${queryKey[0]}`)
+  return res.data;
+}
+
 export const createProduct = async (newData) => {
   return axios.post('/products', newData)
 };
