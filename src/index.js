@@ -12,7 +12,13 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 
 axios.defaults.baseURL = 'http://localhost:5000/api'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false
+    }
+  }
+})
 
 ReactDOM.render(
   // <React.StrictMode>

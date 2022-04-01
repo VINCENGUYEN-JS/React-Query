@@ -4,24 +4,21 @@ import Pagination from '../components/Pagination'
 import Products from '../components/Products'
 import Sorting from '../components/Sorting'
 import { useMyContext } from '../context/store'
-import { useQuery } from 'react-query'
+import { useQuery, useQueries } from 'react-query'
 import { getData } from '../api/productAPI'
 
 const Home = () => {
   const [limit, setLimit] = useState(5)
   const { page, sort, refetching } = useMyContext()
 
-  // const { data, loading, error } = useQuery(
-  //   `/products?limit=${limit}&page=${page}&sort=${sort}`,
-  //   { saveCache: true, refetching }
-  // )
 
   const key = `/products?limit=${limit}&page=${page}&sort=${sort}`;
 
   const {data, isLoading, error} = useQuery({
     queryKey: key,
-    queryFn: getData
+    queryFn: getData,
   })
+ 
 
   const totalPages = useMemo(() => {
     if(!data?.count) return 0;
@@ -39,7 +36,9 @@ const Home = () => {
         isLoading && <p style={{textAlign: 'center'}}>Loading...</p> 
       }
       
-      { error && <p style={{textAlign: 'center'}}>{error}</p> }
+      { 
+        error && <p style={{textAlign: 'center'}}>{error.message}</p> 
+      }
       <Pagination totalPages={totalPages} />
     </main>
   )

@@ -19,7 +19,9 @@ const ProductDetail = () => {
       { 
         isLoading && <p style={{textAlign: 'center'}}>Loading...</p> 
       }
-      { error && <p style={{textAlign: 'center'}}>{error}</p> }
+      { 
+        error && <p style={{textAlign: 'center'}}>{error.message}</p> 
+      }
     </main>
   )
 }

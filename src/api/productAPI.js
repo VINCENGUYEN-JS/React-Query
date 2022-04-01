@@ -1,8 +1,23 @@
 import axios from "axios";
+import { toast } from "react-toastify";
+
+const handleError = (err) => {
+  if(err.response.data.msg){
+    toast.error(err.response.data.msg)
+    throw new Error(err.response.data.msg)
+  }else{
+    toast.error(err.message)
+    throw new Error(err.message)
+  }
+}
 
 export const getData = async ({ queryKey }) => {
-  const res = await axios.get(`${queryKey[0]}`)
-  return res.data;
+  try {
+    const res = await axios.get(`${queryKey[0]}`)
+    return res.data;
+  } catch (err) {
+    handleError(err)
+  }
 }
 
 export const createProduct = async (newData) => {
