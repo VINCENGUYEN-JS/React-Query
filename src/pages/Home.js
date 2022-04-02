@@ -14,9 +14,9 @@ const Home = () => {
 
   const key = `/products?limit=${limit}&page=${page}&sort=${sort}`;
 
-  const {data, isLoading, error} = useQuery({
+  const {data, isLoading, error, refetch} = useQuery({
     queryKey: key,
-    queryFn: getData,
+    queryFn: getData
   })
  
 
@@ -24,6 +24,10 @@ const Home = () => {
     if(!data?.count) return 0;
     return Math.ceil(data.count / limit)
   }, [data?.count, limit])
+
+  useEffect(() => {
+    refetch()
+  }, [refetching])
 
 
   return(

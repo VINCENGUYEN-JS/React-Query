@@ -7,10 +7,13 @@ import { getData } from '../api/productAPI'
 const ProductDetail = () => {
   const { id } = useParams()
 
+
   const key = `/products/${id}`;
   const { 
     data: product, isLoading, error 
-  } = useQuery(key, getData)
+  } = useQuery(key, getData, {
+    enabled: !!id
+  })
 
 
   return (
