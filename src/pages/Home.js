@@ -4,7 +4,7 @@ import Pagination from '../components/Pagination'
 import Products from '../components/Products'
 import Sorting from '../components/Sorting'
 import { useMyContext } from '../context/store'
-import { useQuery, useQueries } from 'react-query'
+import { useQuery } from 'react-query'
 import { getData } from '../api/productAPI'
 
 const Home = () => {
@@ -14,9 +14,12 @@ const Home = () => {
 
   const key = `/products?limit=${limit}&page=${page}&sort=${sort}`;
 
-  const {data, isLoading, error, refetch} = useQuery({
+  const {
+    data, isFetching, error, refetch, isPreviousData
+  } = useQuery({
     queryKey: key,
-    queryFn: getData
+    queryFn: getData,
+    keepPreviousData: true
   })
  
 
@@ -27,8 +30,10 @@ const Home = () => {
 
   useEffect(() => {
     refetch()
-  }, [refetching])
+  }, [refetching, refetch])
 
+  // console.log({data, isLoading, isSuccess})
+  // console.log({isPreviousData})
 
   return(
     <main>
@@ -37,7 +42,8 @@ const Home = () => {
       { data && <Products products={data.products} />}
       
       { 
-        isLoading && <p style={{textAlign: 'center'}}>Loading...</p> 
+        (isPreviousData && isFetching) && 
+        <p style={{textAlign: 'center'}}>Loading...</p> 
       }
       
       { 
