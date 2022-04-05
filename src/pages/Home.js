@@ -19,18 +19,18 @@ const Home = () => {
   } = useQuery({
     queryKey: key,
     queryFn: getData,
-    keepPreviousData: true
+    keepPreviousData: true,
+    // cacheTime: 0
   })
- 
 
   const totalPages = useMemo(() => {
     if(!data?.count) return 0;
     return Math.ceil(data.count / limit)
   }, [data?.count, limit])
 
-  useEffect(() => {
-    refetch()
-  }, [refetching, refetch])
+  // useEffect(() => {
+  //   refetch()
+  // }, [refetching, refetch])
 
   // console.log({data, isLoading, isSuccess})
   // console.log({isPreviousData})
