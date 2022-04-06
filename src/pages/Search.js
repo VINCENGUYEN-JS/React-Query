@@ -1,51 +1,66 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Products from '../components/Products'
 import Sorting from '../components/Sorting'
 import { useMyContext } from '../context/store'
-import useInfinityQuery from '../hooks/useInfinityQuery'
+import { useInfiniteQuery } from 'react-query'
+import { getInfiniteData } from '../api/productAPI'
 
 const Search = () => {
   const { value } = useParams()
   const { sort } = useMyContext()
 
-  const [products, setProducts] = useState([])
   const [limit, setLimit] = useState(2)
-  const [stop, setStop] = useState(false)
-  const [firstLoad, setFirstLoad] = useState(false)
 
+  const key = `/products?search=${value}&sort=${sort}&limit=${limit}`;
 
-  const { BtnRender, data, loading, error } = useInfinityQuery({
-    url: `/products?search=${value}&sort=${sort}&limit=${limit}`,
-    depens: [value, sort],
-    opt: { stop, firstLoad }
-  })
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery(key, getInfiniteData, {
+    getNextPageParam: (lastPage, pages) => {
+      // console.log({lastPage, pages})
+      const { products } = lastPage;
+      if(products.length >= limit){
+        return pages.length + 1;
+      }else{
+        return undefined
+      }
+    },
+  }) 
 
-  useEffect(() => {
-    if(data?.products) {
-      setProducts(prev => [...prev, ...data.products])
-      setFirstLoad(true)
-
-      if(data.products.length < limit) setStop(true)
-    }
-  }, [data?.products, limit])
-
-  useEffect(() => {
-    setProducts([])
-    setStop(false)
-    setFirstLoad(false)
-  }, [value, sort])
-
-
+  // console.log({hasNextPage, isFetchingNextPage, isFetching})
 
   return (
     <>
       <Sorting />
-      <Products products={products} />
-      { loading && <p style={{textAlign: 'center'}}>Loading...</p> }
+      
+      <div className='products'>
+        {
+          data?.pages.map((page, index) => (
+            <Products key={index} products={page.products} />
+          ))
+        }
+      </div>
+      
+      { 
+        isFetching && <p style={{textAlign: 'center'}}>Loading...</p> 
+      }
+      
       { error && <p style={{textAlign: 'center'}}>{error}</p> }
 
-      { BtnRender() }
+      <button className="btn-load_more"
+      onClick={() => fetchNextPage()}
+      disabled={!hasNextPage || isFetchingNextPage}
+      >
+        Load more
+      </button>
+
     </>
   )
 }

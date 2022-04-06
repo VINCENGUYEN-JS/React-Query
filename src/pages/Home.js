@@ -39,7 +39,9 @@ const Home = () => {
     <main>
       <Sorting page={page} />
 
-      { data && <Products products={data.products} />}
+      <div className='products'>
+        { data && <Products products={data.products} />}
+      </div>
       
       { 
         (isPreviousData && isFetching) && 

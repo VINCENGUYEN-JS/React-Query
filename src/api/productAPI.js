@@ -20,6 +20,17 @@ export const getData = async ({ queryKey }) => {
   }
 }
 
+export const getInfiniteData = async ({ queryKey, pageParam = 1}) => {
+  // console.log(`url : ${queryKey[0]}&page=${pageParam}`)
+  // console.log({pageParam})
+  try {
+    const res = await axios.get(`${queryKey[0]}&page=${pageParam}`)
+    return res.data;
+  } catch (err) {
+    handleError(err)
+  }
+}
+
 export const createProduct = async (newData) => {
   return axios.post('/products', newData)
 };
