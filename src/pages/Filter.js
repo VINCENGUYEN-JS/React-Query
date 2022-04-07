@@ -1,48 +1,74 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Products from '../components/Products'
 import Sorting from '../components/Sorting'
 import { useMyContext } from '../context/store'
-import useInfinityQuery from '../hooks/useInfinityQuery'
+import { useInfiniteQuery } from 'react-query'
+import { getInfiniteData } from '../api/productAPI'
+import useInView from '../hooks/useInView'
 
 const Filter = () => {
   const { option, value } = useParams()
   const { sort } = useMyContext()
-
-  const [products, setProducts] = useState([])
   const [limit, setLimit] = useState(2)
-  const [stop, setStop] = useState(false)
-  const [firstLoad, setFirstLoad] = useState(false)
 
+  const { ref, inView } = useInView()
 
-  const { BtnRender, data, loading, error } = useInfinityQuery({
-    url: `/products?price[${option}]=${value}&sort=${sort}&limit=${limit}`,
-    depens: [value, sort, option],
-    opt: { stop, firstLoad }
-  })
+  const key = `/products?price[${option}]=${value}&sort=${sort}&limit=${limit}`;
+
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+  } = useInfiniteQuery(key, getInfiniteData, {
+    getNextPageParam: (lastPage, pages) => {
+      // console.log({lastPage, pages})
+      const { products } = lastPage;
+      if(products.length >= limit){
+        return pages.length + 1;
+      }else{
+        return undefined
+      }
+    },
+  }) 
 
   useEffect(() => {
-    if(data?.products) {
-      setProducts(prev => [...prev, ...data.products])
-      setFirstLoad(true)
-
-      if(data.products.length < limit) setStop(true)
+    if(inView && !isFetchingNextPage){
+      fetchNextPage()
     }
-  }, [data?.products, limit])
-
-  useEffect(() => {
-    setProducts([])
-    setStop(false)
-    setFirstLoad(false)
-  }, [value, sort, option])
+  }, [inView, isFetchingNextPage, fetchNextPage])
+  
 
   return (
     <> 
       <Sorting />
-      <Products products={products} />
-      { loading && <p style={{textAlign: 'center'}}>Loading...</p> }
-      { error && <p style={{textAlign: 'center'}}>{error}</p> }
-      { BtnRender() }
+      
+      <div className='products'>
+        {
+          data?.pages.map((page, index) => (
+            <Products key={index} products={page.products} />
+          ))
+        }
+      </div>
+      
+      { 
+        isFetching && <p style={{textAlign: 'center'}}>Loading...</p> 
+      }
+      
+      { 
+        error && <p style={{textAlign: 'center'}}>{error.message}</p> 
+      }
+
+      <button className="btn-load_more"
+      onClick={() => fetchNextPage()} 
+      disabled={!hasNextPage || isFetchingNextPage}
+      ref={ref}
+      >
+        Load more
+      </button>
     </>
   )
 }
