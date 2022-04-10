@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import { useInfiniteQuery, useQueryClient } from 'react-query'
+
 import Products from '../components/Products'
 import Sorting from '../components/Sorting'
 import { useMyContext } from '../context/store'
-import { useInfiniteQuery } from 'react-query'
 import { getInfiniteData } from '../api/productAPI'
 import useInView from '../hooks/useInView'
 
@@ -13,8 +14,12 @@ const Filter = () => {
   const [limit, setLimit] = useState(2)
 
   const { ref, inView } = useInView()
+  const queryClient = useQueryClient()
 
   const key = `/products?price[${option}]=${value}&sort=${sort}&limit=${limit}`;
+
+  queryClient.setQueryData('keys', {k1: '', k2: key})
+
 
   const {
     data,

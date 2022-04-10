@@ -1,18 +1,22 @@
 import { useState, useEffect, useMemo } from 'react'
+import { useQuery, useQueryClient } from 'react-query'
 
 import Pagination from '../components/Pagination'
 import Products from '../components/Products'
 import Sorting from '../components/Sorting'
 import { useMyContext } from '../context/store'
-import { useQuery } from 'react-query'
 import { getData } from '../api/productAPI'
 
 const Home = () => {
   const [limit, setLimit] = useState(5)
   const { page, sort, refetching } = useMyContext()
 
+  const queryClient = useQueryClient()
 
   const key = `/products?limit=${limit}&page=${page}&sort=${sort}`;
+
+  queryClient.setQueryData('keys', {k1: key, k2: ''})
+
 
   const {
     data, isFetching, error, refetch, isPreviousData
