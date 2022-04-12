@@ -18,23 +18,21 @@ const ProductDetail = () => {
     data: product, isLoading, error 
   } = useQuery(key, getData, {
     enabled: !!id,
-    placeholderData: () => {
+    cacheTime: 0,
+    initialData: () => {
       if(keys?.k1){
         const data = queryClient.getQueryData(keys.k1)
         return data.products.find(d => d._id === id)
       }
 
       if(keys?.k2){
-        let product;
         const pages = queryClient.getQueryData(keys.k2)?.pages
 
-        pages.map(page => {
-          return page.products.forEach(d => {
-            if(d._id === id) product = d;
-          })
-        })
+        const products = pages.reduce((result, current) => {
+          return [...result, ...current.products]
+        }, [])
 
-        return product;
+        return products.find(d => d._id === id)
       }
     }
   })

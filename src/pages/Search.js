@@ -41,10 +41,10 @@ const Search = () => {
   }) 
 
   useEffect(() => {
-    if(inView && !isFetchingNextPage){
+    if(inView){
       fetchNextPage()
     }
-  }, [inView, isFetchingNextPage, fetchNextPage])
+  }, [inView, fetchNextPage])
   // console.log({hasNextPage, isFetchingNextPage, isFetching})
 
   return (
@@ -71,6 +71,7 @@ const Search = () => {
       onClick={() => fetchNextPage()} 
       disabled={!hasNextPage || isFetchingNextPage}
       ref={ref}
+      style={{display: (data && hasNextPage) ? 'block' : 'none'}}
       >
         Load more
       </button>

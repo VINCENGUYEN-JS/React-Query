@@ -14,8 +14,14 @@ const Home = () => {
   const queryClient = useQueryClient()
 
   const key = `/products?limit=${limit}&page=${page}&sort=${sort}`;
+  const key1 = `/products?limit=${limit}&page=${page + 1}&sort=${sort}`;
 
   queryClient.setQueryData('keys', {k1: key, k2: ''})
+
+  useEffect(async () => {
+    // The results of this query will be cached like a normal query
+    await queryClient.prefetchQuery(key1, getData)
+  }, [key1])
 
 
   const {
@@ -24,7 +30,6 @@ const Home = () => {
     queryKey: key,
     queryFn: getData,
     keepPreviousData: true,
-    // cacheTime: 0
   })
 
   const totalPages = useMemo(() => {

@@ -41,10 +41,10 @@ const Filter = () => {
   }) 
 
   useEffect(() => {
-    if(inView && !isFetchingNextPage){
+    if(inView){
       fetchNextPage()
     }
-  }, [inView, isFetchingNextPage, fetchNextPage])
+  }, [inView, fetchNextPage])
   
 
   return (
@@ -71,6 +71,7 @@ const Filter = () => {
       onClick={() => fetchNextPage()} 
       disabled={!hasNextPage || isFetchingNextPage}
       ref={ref}
+      style={{display: (data && hasNextPage) ? 'block' : 'none'}}
       >
         Load more
       </button>
