@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const handleError = (err) => {
+export const handleError = (err) => {
   if(err.response.data.msg){
     toast.error(err.response.data.msg)
     throw new Error(err.response.data.msg)
@@ -32,13 +32,16 @@ export const getInfiniteData = async ({ queryKey, pageParam = 1}) => {
 }
 
 export const createProduct = async (newData) => {
-  return axios.post('/products', newData)
+  const res = await axios.post('/products', newData)
+  return res.data;
 };
 
 export const updateProduct = async ({id, newData}) => {
-  return axios.put(`/products/${id}`, newData)
+  const res = await axios.put(`/products/${id}`, newData)
+  return res.data;
 };
 
 export const deleteProduct = async (id) => {
-  return axios.delete(`/products/${id}`)
+  const res = await axios.delete(`/products/${id}`)
+  return res.data;
 };

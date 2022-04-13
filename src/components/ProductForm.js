@@ -1,10 +1,24 @@
 import React, { useRef } from 'react'
-import { createProduct, updateProduct } from '../api/productAPI'
-import useMutation from '../hooks/useMutation'
+import { createProduct, handleError, updateProduct } from '../api/productAPI'
+import { useMutation } from 'react-query'
+import { toast } from 'react-toastify'
 
 const ProductForm = ({ btnTxt, data }) => {
   const multiRef = useRef()
-  const { mutate, loading } = useMutation()
+  
+  const create = useMutation(createProduct, 
+    {
+      onSuccess: () => toast.success('Create Product!'),
+      onError: (error) => handleError(error)
+    }
+  )
+
+  const update = useMutation(updateProduct,
+    {
+      onSuccess: () => toast.success('Update Product!'),
+      onError: (error) => handleError(error)
+    } 
+  )
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -19,15 +33,12 @@ const ProductForm = ({ btnTxt, data }) => {
       const newArr = {...newData, price: Number(newData.price)} 
       const result = shallowEqual(newArr, data)
       if(result) return;
-      // axios.put(`products/${data._id}`, newData)
-      // .then(res => console.log(res))
-      // updateProduct({id: data._id, newData})
-      // .then(res => console.log(res))
-      mutate(() => updateProduct({id: data._id, newData}))
+    
+      // mutate(() => updateProduct({id: data._id, newData}))
+      update.mutate({id: data._id, newData})
     }else{
-      // axios.post(`products`, newData).then(res => console.log(res))
-      // createProduct(newData).then(res => console.log(res))
-      mutate(() => createProduct(newData))
+      // mutate(() => createProduct(newData))
+      create.mutate(newData)
     }
   }
 
@@ -71,8 +82,10 @@ const ProductForm = ({ btnTxt, data }) => {
         defaultValue={data?.image}
         />
         
-        <button disabled={loading}>
-          { loading ? 'Loading..' : btnTxt }
+        <button disabled={create.isLoading || update.isLoading}>
+          { create.isLoading || update.isLoading 
+            ? 'Loading..' : btnTxt 
+          }
         </button>
       </form>
     </div>
