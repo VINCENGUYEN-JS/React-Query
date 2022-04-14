@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { deleteProduct, handleError } from '../api/productAPI'
 import useLazyLoadImg from '../hooks/useLazyLoadImg'
@@ -10,11 +10,16 @@ import { toast } from 'react-toastify'
 
 const ProductsCard = ({ product }) => {
   const [openProduct, setOpenProduct] = useState(false)
+
+  const queryClient = useQueryClient()
   
   const { mutate, isLoading } = useMutation(deleteProduct, 
     {
       onSuccess: () => toast.success('Delete Product!'),
-      onError: (error) => handleError(error)
+      onError: (error) => handleError(error),
+      onSettled: () => queryClient.invalidateQueries({
+        predicate: query => query.queryKey.startsWith('/products')
+      })
     } 
   )
 

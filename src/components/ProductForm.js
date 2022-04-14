@@ -1,22 +1,31 @@
 import React, { useRef } from 'react'
 import { createProduct, handleError, updateProduct } from '../api/productAPI'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
 
 const ProductForm = ({ btnTxt, data }) => {
   const multiRef = useRef()
+
+  const queryClient = useQueryClient()
+  const keys = queryClient.getQueryData('keys')
   
   const create = useMutation(createProduct, 
     {
       onSuccess: () => toast.success('Create Product!'),
-      onError: (error) => handleError(error)
+      onError: (error) => handleError(error),
+      onSettled: () => queryClient.invalidateQueries({
+        predicate: query => query.queryKey.startsWith('/products')
+      })
     }
   )
 
   const update = useMutation(updateProduct,
     {
       onSuccess: () => toast.success('Update Product!'),
-      onError: (error) => handleError(error)
+      onError: (error) => handleError(error),
+      onSettled: () => {
+        queryClient.invalidateQueries(keys?.k1 || keys?.k2)
+      }
     } 
   )
 
