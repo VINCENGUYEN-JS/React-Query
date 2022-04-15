@@ -21,10 +21,23 @@ const ProductForm = ({ btnTxt, data }) => {
 
   const update = useMutation(updateProduct,
     {
+      onMutate: (data) => {
+        if(!keys?.k1) return;
+
+        queryClient.setQueryData(keys?.k1, (oldData) => {
+          const products = oldData?.products.map(product => (
+            product._id === data.id
+            ? {...product, ...data.newData}
+            : product
+          ))
+          
+          return {...oldData, products}
+        })
+      },
       onSuccess: () => toast.success('Update Product!'),
       onError: (error) => handleError(error),
       onSettled: () => {
-        queryClient.invalidateQueries(keys?.k1 || keys?.k2)
+        if(keys?.k2) queryClient.invalidateQueries(keys.k2)
       }
     } 
   )

@@ -7,8 +7,7 @@ export const useMyContext = () => useContext(Store)
 
 export const ContextProvider = ({children}) => {
   const { search } = useLocation()
-  const cache = useRef({})
-  const [refetching, setRefetching] = useState(false)
+
 
   const { page, sort } = useMemo(() => {
     const page = new URLSearchParams(search).get('page') || 1;
@@ -20,7 +19,7 @@ export const ContextProvider = ({children}) => {
   }, [search])
 
 
-  const value = { page, sort, cache, refetching, setRefetching };
+  const value = { page, sort };
 
   Store.displayName = "DEVAT";
   return (

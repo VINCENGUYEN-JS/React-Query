@@ -9,23 +9,17 @@ import { getData } from '../api/productAPI'
 
 const Home = () => {
   const [limit, setLimit] = useState(5)
-  const { page, sort, refetching } = useMyContext()
+  const { page, sort } = useMyContext()
 
   const queryClient = useQueryClient()
 
   const key = `/products?limit=${limit}&page=${page}&sort=${sort}`;
-  const key1 = `/products?limit=${limit}&page=${page + 1}&sort=${sort}`;
 
   queryClient.setQueryData('keys', {k1: key, k2: ''})
 
-  useEffect(async () => {
-    // The results of this query will be cached like a normal query
-    await queryClient.prefetchQuery(key1, getData)
-  }, [key1])
-
 
   const {
-    data, isFetching, error, refetch, isPreviousData
+    data, isFetching, error, isPreviousData
   } = useQuery({
     queryKey: key,
     queryFn: getData,
@@ -37,12 +31,6 @@ const Home = () => {
     return Math.ceil(data.count / limit)
   }, [data?.count, limit])
 
-  // useEffect(() => {
-  //   refetch()
-  // }, [refetching, refetch])
-
-  // console.log({data, isLoading, isSuccess})
-  // console.log({isPreviousData})
 
   return(
     <main>
