@@ -17,6 +17,7 @@ const Home = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: key,
     queryFn: getData,
+    retry: false,
   });
 
   console.log({ data });
@@ -31,7 +32,7 @@ const Home = () => {
       <Sorting page={page} />
       {data && <Products products={data.products} />}
       {isLoading && <p style={{ textAlign: "center" }}>Loading...</p>}
-      {error && <p style={{ textAlign: "center" }}>{error}</p>}
+      {error && <p style={{ textAlign: "center" }}>{error.message}</p>}
       <Pagination totalPages={totalPages} />
     </main>
   );
