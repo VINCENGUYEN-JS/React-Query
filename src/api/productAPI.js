@@ -13,6 +13,15 @@ export const getData = async ({ queryKey }) => {
   }
 };
 
+export const getInfiniteData = async ({ queryKey, pageParam = 1 }) => {
+  try {
+    const res = await axios.get(`${queryKey[0]}&page=${pageParam}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(err.response.data.msg);
+  }
+};
+
 export const createProduct = async (newData) => {
   return axios.post("/products", newData);
 };

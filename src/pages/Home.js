@@ -12,15 +12,17 @@ const Home = () => {
 
   const { page, sort, refetching } = useMyContext();
 
+  console.log({ page, sort });
+
   const key = `/products?limit=${limit}&page=${page}&sort=${sort}`;
 
   const { data, isLoading, error } = useQuery({
     queryKey: key,
     queryFn: getData,
     retry: false,
+    keepPreviousData: true,
+    staleTime: 5000,
   });
-
-  console.log({ data });
 
   const totalPages = useMemo(() => {
     if (!data?.count) return 0;
