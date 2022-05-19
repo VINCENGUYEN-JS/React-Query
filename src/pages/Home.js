@@ -21,7 +21,7 @@ const Home = () => {
     queryFn: getData,
     retry: false,
     keepPreviousData: true,
-    staleTime: 5000,
+    staleTime: 15000,
   });
 
   const totalPages = useMemo(() => {
