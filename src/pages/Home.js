@@ -4,7 +4,7 @@ import Pagination from "../components/Pagination";
 import Products from "../components/Products";
 import Sorting from "../components/Sorting";
 import { useMyContext } from "../context/store";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { getData } from "./../api/productAPI";
 
 const Home = () => {
@@ -12,9 +12,11 @@ const Home = () => {
 
   const { page, sort, refetching } = useMyContext();
 
-  console.log({ page, sort });
-
   const key = `/products?limit=${limit}&page=${page}&sort=${sort}`;
+
+  const queryClient = useQueryClient();
+
+  queryClient.setQueryData("keys", { k1: key, k2: "" });
 
   const { data, isLoading, error } = useQuery({
     queryKey: key,
