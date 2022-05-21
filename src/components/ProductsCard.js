@@ -1,20 +1,30 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { deleteProduct } from "../api/productAPI";
-import useMutation from "../hooks/useMutation";
+// import useMutation from "../hooks/useMutation";
 // import LazyLoadImg from './LazyLoadImg'
 import useLazyLoading from "../hooks/useLazyLoading";
 import Modal from "./Modal";
 import ProductForm from "./ProductForm";
 
+import { useMutation } from "react-query";
+import { toast } from "react-toastify";
+
 const ProductsCard = ({ product }) => {
   const [openProduct, setOpenProduct] = useState(false);
-  const { mutate, loading } = useMutation();
+  const { mutate, isLoading } = useMutation((data) => deleteProduct(data), {
+    onSuccess: () => {
+      toast.success("Create Product!");
+    },
+    onError: (err) => {
+      toast.error(err.response.data.msg);
+    },
+  });
   const { ref: imgRef } = useLazyLoading();
 
   const handleDelete = (id) => {
     if (window.confirm("Do you want to delete this?")) {
-      mutate(() => deleteProduct(id));
+      mutate(id);
     }
   };
 
@@ -40,10 +50,10 @@ const ProductsCard = ({ product }) => {
 
           <button
             className="btn_delete"
-            disabled={loading}
+            disabled={isLoading}
             onClick={() => handleDelete(product._id)}
           >
-            {loading ? "Loading..." : "Delete"}
+            {isLoading ? "Loading..." : "Delete"}
           </button>
         </div>
       </div>
