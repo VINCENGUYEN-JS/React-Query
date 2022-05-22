@@ -1,31 +1,39 @@
 import React, { useRef } from "react";
-import { createProduct, updateProduct } from "../api/productAPI";
-// import useMutation from '../hooks/useMutation'
-
+import { createProduct, handleError, updateProduct } from "../api/productAPI";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 
 const ProductForm = ({ btnTxt, data }) => {
   const multiRef = useRef();
+
   const queryClient = useQueryClient();
-  const create = useMutation((data) => createProduct(data), {
-    onSuccess: () => {
-      toast.success("Create Product!");
-    },
-    onError: (err) => {
-      toast.error(err.response.data.msg);
-    },
+  const keys = queryClient.getQueryData("keys");
+
+  const create = useMutation(createProduct, {
+    onSuccess: () => toast.success("Create Product!"),
+    onError: (error) => handleError(error),
     onSettled: () =>
       queryClient.invalidateQueries({
-        predicate: (key) => key.queryKey.startsWith("/products"),
+        predicate: (query) => query.queryKey.startsWith("/products"),
       }),
   });
-  const update = useMutation((data) => updateProduct(data), {
-    onSuccess: () => {
-      toast.success("Create Product!");
+
+  const update = useMutation(updateProduct, {
+    onMutate: (data) => {
+      if (!keys?.k1) return;
+
+      queryClient.setQueryData(keys?.k1, (oldData) => {
+        const products = oldData?.products.map((product) =>
+          product._id === data.id ? { ...product, ...data.newData } : product
+        );
+
+        return { ...oldData, products };
+      });
     },
-    onError: (err) => {
-      toast.error(err.response.data.msg);
+    onSuccess: () => toast.success("Update Product!"),
+    onError: (error) => handleError(error),
+    onSettled: () => {
+      if (keys?.k2) queryClient.invalidateQueries(keys.k2);
     },
   });
 
@@ -42,14 +50,11 @@ const ProductForm = ({ btnTxt, data }) => {
       const newArr = { ...newData, price: Number(newData.price) };
       const result = shallowEqual(newArr, data);
       if (result) return;
-      // axios.put(`products/${data._id}`, newData)
-      // .then(res => console.log(res))
-      // updateProduct({id: data._id, newData})
-      // .then(res => console.log(res))
+
+      // mutate(() => updateProduct({id: data._id, newData}))
       update.mutate({ id: data._id, newData });
     } else {
-      // axios.post(`products`, newData).then(res => console.log(res))
-      // createProduct(newData).then(res => console.log(res))
+      // mutate(() => createProduct(newData))
       create.mutate(newData);
     }
   };
