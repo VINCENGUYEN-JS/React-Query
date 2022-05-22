@@ -2,11 +2,12 @@ import React, { useRef } from "react";
 import { createProduct, updateProduct } from "../api/productAPI";
 // import useMutation from '../hooks/useMutation'
 
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 
 const ProductForm = ({ btnTxt, data }) => {
   const multiRef = useRef();
+  const queryClient = useQueryClient();
   const create = useMutation((data) => createProduct(data), {
     onSuccess: () => {
       toast.success("Create Product!");
@@ -14,6 +15,10 @@ const ProductForm = ({ btnTxt, data }) => {
     onError: (err) => {
       toast.error(err.response.data.msg);
     },
+    onSettled: () =>
+      queryClient.invalidateQueries({
+        predicate: (key) => key.queryKey.startsWith("/products"),
+      }),
   });
   const update = useMutation((data) => updateProduct(data), {
     onSuccess: () => {
